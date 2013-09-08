@@ -7,5 +7,6 @@ setup(
   packages=['flask_static'],
   include_package_data=True,
   zip_safe=False,
-  install_requires=['Flask']
+  install_requires=['Flask', 'Flask-SQLAlchemy', 'Frozen-Flask', 'inflection',
+    'PyYAML', 'Markdown']
 )
