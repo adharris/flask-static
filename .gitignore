@@ -2,6 +2,7 @@
 
 # Virtualenv
 venv
+testapp
 
 # C extensions
 *.so
