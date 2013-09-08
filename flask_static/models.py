@@ -57,11 +57,6 @@ def create_model_base(db):
 
       self.front_matter = fm
 
-
-    @property
-    def url(self):
-      return url_for('post', year = self.date.year, month=self.date.month, day=self.date.day, id=self.id)
-
     @property
     def excerpt(self):
       content = self.body.split(current_app.config.get('EXCERPT_SEPARATOR', '\n\n'))[0]
