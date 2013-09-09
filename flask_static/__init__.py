@@ -36,9 +36,6 @@ class Static(object):
     self.db.init_app(app)
     self.freezer.init_app(app)
 
-    with app.app_context():
-      filenames = [str(f) for m, f in self.get_model_files()]
-
     try:
       app.jinja_env.add_extension('jinja2_highlight.HighlightExtension')
     except:
@@ -46,7 +43,12 @@ class Static(object):
 
     app.before_first_request(self.rebuild_database)
 
+    with app.app_context():
+      self.filenames = [str(f) for m, f in self.get_model_files()]
+
+
   def run(self, **options):
+    options['extra_files'] =  options.get("extra_files", []) + self.filenames
     self.freezer.run(**options)
 
 
