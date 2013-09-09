@@ -18,7 +18,7 @@ class Static(object):
 
   def __init__(self, app=None, db=None, freezer=None):
     self.db = db or SQLAlchemy()
-    self.freezer = freezer or Freezer()
+    self.freezer = freezer or Freezer(with_static_files=False)
     self.Model = create_model_base(self.db)
     self.app = app
 
@@ -27,20 +27,11 @@ class Static(object):
     if app is not None:
       self.init_app(app)
 
-  def run_wrapper(self, f, extra_files):
-    def run(*args, **kwargs):
-      extra = kwargs.pop('extra_files', [])
-      self.freezer.freeze()
-      return f(*args, extra_files=extra_files, **kwargs)
-    return run
-
-
   def init_app(self, app):
 
     app.config.setdefault("STATIC_MODELS_DIRECTORY", 'models')
     app.config.setdefault("STATIC_FILE_REGEXP",
       r'^((?P<date>[0-9]{4}-[0-9]{2}-[0-9]{2})-)?(?P<id>.*)\.(?P<format>.+)$')
-
 
     self.db.init_app(app)
     self.freezer.init_app(app)
@@ -48,17 +39,21 @@ class Static(object):
     with app.app_context():
       filenames = [str(f) for m, f in self.get_model_files()]
 
-    app.run = self.run_wrapper(app.run, extra_files=filenames)
-
+    try:
+      app.jinja_env.add_extension('jinja2_highlight.HighlightExtension')
+    except:
+      pass
 
     app.before_first_request(self.rebuild_database)
+
+  def run(self, **options):
+    self.freezer.run(**options)
 
 
   def rebuild_database(self):
     print " * Rebuilding static database"
     self.db.drop_all()
     self.db.create_all()
-
     self.load_models()
 
   def load_models(self):
