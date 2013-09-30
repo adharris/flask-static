@@ -107,9 +107,3 @@ class Static(object):
 
     return None, None
 
-
-  def __getattr__(self, name):
-    if name not in self._models:
-      self._models[name] = self.Model.create_base(name)
-    return self._models[name]
-
